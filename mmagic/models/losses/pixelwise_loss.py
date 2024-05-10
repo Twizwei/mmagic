@@ -5,6 +5,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+import lpips
+
 from mmagic.registry import MODELS
 from .loss_wrapper import masked_loss
 
@@ -219,7 +221,6 @@ class CharbonnierLoss(nn.Module):
             eps=self.eps,
             reduction=self.reduction,
             sample_wise=self.sample_wise)
-
 
 @MODELS.register_module()
 class MaskedTVLoss(L1Loss):

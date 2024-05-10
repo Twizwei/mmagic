@@ -6,7 +6,7 @@ from mmengine.model import BaseModel
 
 from mmagic.registry import MODELS
 from mmagic.structures import DataSample
-
+import lpips 
 
 @MODELS.register_module()
 class BaseEditModel(BaseModel):
@@ -35,6 +35,7 @@ class BaseEditModel(BaseModel):
     def __init__(self,
                  generator: dict,
                  pixel_loss: dict,
+                 perceptual_loss: float, 
                  train_cfg: Optional[dict] = None,
                  test_cfg: Optional[dict] = None,
                  init_cfg: Optional[dict] = None,
@@ -50,6 +51,8 @@ class BaseEditModel(BaseModel):
 
         # loss
         self.pixel_loss = MODELS.build(pixel_loss)
+        self.perceptual_loss = perceptual_loss
+        # self.perceptual_loss = MODELS.build(perceptual_loss)
 
     def forward(self,
                 inputs: torch.Tensor,

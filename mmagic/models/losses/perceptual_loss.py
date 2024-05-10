@@ -7,7 +7,7 @@ import torchvision.models.vgg as vgg
 from mmengine import MMLogger
 from mmengine.runner import load_checkpoint
 from torch.nn import functional as F
-
+import lpips
 from mmagic.registry import MODELS
 
 
@@ -94,6 +94,37 @@ class PerceptualVGG(nn.Module):
         logger = MMLogger.get_current_instance()
         load_checkpoint(model, pretrained, logger=logger)
 
+class LPIPSNetwork(nn.Module):
+    def __init__(self, net='vgg'):
+        super().__init__()
+        self.network = lpips.LPIPS(net=net)
+    
+    def forward(self, x, gt):
+        return self.network(x, gt).mean()
+
+@MODELS.register_module()
+class LPIPSLoss(nn.Module):
+    def __init__(self, loss_weight=1.0, net='vgg'):
+        super(LPIPSLoss, self).__init__()
+        self.lpips = LPIPSNetwork(net=net)
+        self.loss_weight = loss_weight
+
+    def forward(self, x, gt):
+        """Forward function.
+        Args:
+            x (Tensor): Input tensor with shape (n, c, h, w).
+            gt (Tensor): Ground-truth tensor with shape (n, c, h, w).
+        Returns:
+            Tensor: Forward results.
+        """
+        if x.dim() == 5 and gt.dim() == 5:
+            x = x.reshape(-1, x.size(-3), x.size(-2), x.size(-1))
+            gt = gt.reshape(-1, gt.size(-3), gt.size(-2), gt.size(-1))
+        # renormalize x, gt from [0, 1] to [-1, 1]
+        if x.min() >= 0 and x.max() <= 1 and gt.min() >= 0 and gt.max() <= 1:
+            x = 2.0 * x - 1.0
+            gt = 2.0 * gt - 1.0
+        return self.loss_weight * self.lpips(x, gt)
 
 @MODELS.register_module()
 class PerceptualLoss(nn.Module):

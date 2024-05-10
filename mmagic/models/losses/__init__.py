@@ -14,13 +14,13 @@ from .loss_comps import (CLIPLossComps, DiscShiftLossComps, FaceIdLossComps,
                          GANLossComps, GeneratorPathRegularizerComps,
                          GradientPenaltyLossComps, R1GradientPenaltyComps)
 from .loss_wrapper import mask_reduce_loss, reduce_loss
-from .perceptual_loss import (PerceptualLoss, PerceptualVGG,
+from .perceptual_loss import (PerceptualLoss, PerceptualVGG, LPIPSLoss,
                               TransferalPerceptualLoss)
 from .pixelwise_loss import (CharbonnierLoss, L1Loss, MaskedTVLoss, MSELoss,
                              PSNRLoss, tv_loss)
 
 __all__ = [
-    'L1Loss', 'MSELoss', 'CharbonnierLoss', 'L1CompositionLoss',
+    'L1Loss', 'MSELoss', 'CharbonnierLoss', 'LPIPSLoss', 'L1CompositionLoss',
     'MSECompositionLoss', 'CharbonnierCompLoss', 'GANLoss', 'GaussianBlur',
     'GradientPenaltyLoss', 'PerceptualLoss', 'PerceptualVGG', 'reduce_loss',
     'mask_reduce_loss', 'DiscShiftLoss', 'MaskedTVLoss', 'GradientLoss',
