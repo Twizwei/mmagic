@@ -58,7 +58,7 @@ train_dataloader = dict(
     num_workers=6, batch_size=1, dataset=dict(num_input_frames=30, pipeline=train_pipeline))
 
 val_dataloader = dict(
-    num_workers=1, batch_size=2, dataset=dict(num_input_frames=100, pipeline=val_pipeline))
+    num_workers=1, batch_size=1, dataset=dict(num_input_frames=100, pipeline=val_pipeline))
 
 train_cfg = dict(
     type='IterBasedTrainLoop', max_iters=600_000, val_interval=10000)
