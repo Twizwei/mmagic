@@ -11,6 +11,7 @@ model = dict(
         type='BasicVSRPlusPlusNet',
         mid_channels=64,
         num_blocks=7,
+        scale_factor=4,
         is_low_res_input=True,
         spynet_pretrained='https://download.openmmlab.com/mmediting/restorers/'
         'basicvsr/spynet_20210409-c6c1bd09.pth'),

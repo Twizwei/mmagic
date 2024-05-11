@@ -44,6 +44,7 @@ class BasicVSRPlusPlusNet(BaseModule):
     def __init__(self,
                  mid_channels=64,
                  num_blocks=7,
+                 scale_factor=4,
                  max_residue_magnitude=10,
                  is_low_res_input=True,
                  spynet_pretrained=None,
@@ -53,6 +54,7 @@ class BasicVSRPlusPlusNet(BaseModule):
         self.mid_channels = mid_channels
         self.is_low_res_input = is_low_res_input
         self.cpu_cache_length = cpu_cache_length
+        self.scale_factor = scale_factor
 
         # optical flow
         self.spynet = SPyNet(pretrained=spynet_pretrained)
@@ -90,10 +92,13 @@ class BasicVSRPlusPlusNet(BaseModule):
             mid_channels, mid_channels, 2, upsample_kernel=3)
         self.upsample2 = PixelShufflePack(
             mid_channels, 64, 2, upsample_kernel=3)
+        if scale_factor == 8:
+            self.upsample3 = PixelShufflePack(
+            mid_channels, 64, 2, upsample_kernel=3)
         self.conv_hr = nn.Conv2d(64, 64, 3, 1, 1)
         self.conv_last = nn.Conv2d(64, 3, 3, 1, 1)
         self.img_upsample = nn.Upsample(
-            scale_factor=4, mode='bilinear', align_corners=False)
+            scale_factor=scale_factor, mode='bilinear', align_corners=False)
 
         # activation function
         self.lrelu = nn.LeakyReLU(negative_slope=0.1, inplace=True)
@@ -267,6 +272,8 @@ class BasicVSRPlusPlusNet(BaseModule):
             hr = self.reconstruction(hr)
             hr = self.lrelu(self.upsample1(hr))
             hr = self.lrelu(self.upsample2(hr))
+            if self.scale_factor == 8:
+                hr = self.lrelu(self.upsample3(hr))
             hr = self.lrelu(self.conv_hr(hr))
             hr = self.conv_last(hr)
             if self.is_low_res_input:

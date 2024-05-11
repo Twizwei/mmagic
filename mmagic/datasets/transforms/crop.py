@@ -1,7 +1,7 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 import math
 import random
-
+from PIL import Image
 import cv2 as cv
 import mmcv
 import numpy as np
@@ -370,10 +370,22 @@ class PairedRandomCrop(BaseTransform):
         Returns:
             dict: A dict containing the processed data and information.
         """
+        if not self.lq_key in results.keys() and results['scale'] == 8:
+            results[self.lq_key] = [np.array(Image.fromarray(gt_img).resize((results['ori_gt_shape'][0][1]//results['scale'], results['ori_gt_shape'][0][0]//results['scale']), Image.BICUBIC)) for gt_img in results[self.gt_key]]
+            if not isinstance(self.gt_patch_size, int) and len(self.gt_patch_size) > 1:
+                # just return 
+                lq_is_list = isinstance(results[self.lq_key], list)
+                if not lq_is_list:
+                    results[self.lq_key] = [results[self.lq_key]]
+                gt_is_list = isinstance(results[self.gt_key], list)
+                if not gt_is_list:
+                    results[self.gt_key] = [results[self.gt_key]]
+
+                return results
+                
 
         scale = results['scale']
         lq_patch_size = self.gt_patch_size // scale
-
         lq_is_list = isinstance(results[self.lq_key], list)
         if not lq_is_list:
             results[self.lq_key] = [results[self.lq_key]]

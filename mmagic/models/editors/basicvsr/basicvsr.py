@@ -109,19 +109,20 @@ class BasicVSR(BaseEditModel):
         elif self.step_counter == self.fix_iter:
             # train all the parameters
             self.generator.requires_grad_(True)
-
+        
         feats = self.forward_tensor(inputs, data_samples, **kwargs)
         batch_gt_data = data_samples.gt_img
 
         loss = self.pixel_loss(feats, batch_gt_data)
-        if feats.dim() == 5 and batch_gt_data.dim() == 5:
-            feats = feats.reshape(-1, feats.size(-3), feats.size(-2), feats.size(-1))
-            batch_gt_data = batch_gt_data.reshape(-1, batch_gt_data.size(-3), batch_gt_data.size(-2), batch_gt_data.size(-1))
-        # renormalize x, gt from [0, 1] to [-1, 1]
-        if feats.min() >= 0 and feats.max() <= 1 and batch_gt_data.min() >= 0 and batch_gt_data.max() <= 1:
-            feats = 2.0 * batch_gt_data - 1.0
-            batch_gt_data = 2.0 * batch_gt_data - 1.0
-        loss += self.perceptual_loss * perceptual_loss(feats, batch_gt_data).mean()
+        if self.perceptual_loss > 0.0:
+            if feats.dim() == 5 and batch_gt_data.dim() == 5:
+                feats = feats.reshape(-1, feats.size(-3), feats.size(-2), feats.size(-1))
+                batch_gt_data = batch_gt_data.reshape(-1, batch_gt_data.size(-3), batch_gt_data.size(-2), batch_gt_data.size(-1))
+            # renormalize x, gt from [0, 1] to [-1, 1]
+            if feats.min() >= 0 and feats.max() <= 1 and batch_gt_data.min() >= 0 and batch_gt_data.max() <= 1:
+                feats = 2.0 * batch_gt_data - 1.0
+                batch_gt_data = 2.0 * batch_gt_data - 1.0
+            loss += self.perceptual_loss * perceptual_loss(feats, batch_gt_data).mean()
         self.step_counter += 1
 
         return dict(loss=loss)
