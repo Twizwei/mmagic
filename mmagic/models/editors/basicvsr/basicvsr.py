@@ -115,7 +115,7 @@ class BasicVSR(BaseEditModel):
         elif self.step_counter == self.fix_iter:
             # train all the parameters
             self.generator.requires_grad_(True)
-        import pdb; pdb.set_trace()
+
         feats = self.forward_tensor(inputs, data_samples, **kwargs)
         batch_gt_data = data_samples.gt_img
 

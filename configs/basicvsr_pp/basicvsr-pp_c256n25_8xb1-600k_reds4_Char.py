@@ -9,7 +9,7 @@ train_pipeline = [
     dict(type='LoadImageFromFile', key='img', channel_order='rgb'),
     dict(type='LoadImageFromFile', key='gt', channel_order='rgb'),
     dict(type='SetValues', dictionary=dict(scale=4)),
-    dict(type='PairedRandomCrop', gt_patch_size=128),
+    dict(type='PairedRandomCrop', gt_patch_size=256),
     dict(
         type='Flip',
         keys=['img', 'gt'],
